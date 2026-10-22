@@ -23,8 +23,38 @@ void verificador_categoria(char *c) {
     }
 }
 
+void carga_datos(t_autos *m) {
+    int disp;
+
+    printf("Marca: ");
+    scanf("%s", m->marca);
+    while (getchar() != '\n');
+    printf("Modelo: ");
+    scanf("%s", m->modelo);
+    while (getchar() != '\n');
+    printf("Categoria: ");
+    scanf("%c", &m->categoria);
+    while (getchar() != '\n');
+    verificador_categoria(&m->categoria);
+    printf("Anio: ");
+    scanf("%d", &m->anio);
+    while (getchar() != '\n');
+    printf("Precio por dia: ");
+    scanf("%f", &m->precioPorDia);
+    while (getchar() != '\n');
+
+    printf("Disponible (1 o 0): ");
+    while (scanf("%d", &disp) != 1 || (disp != 0 && disp != 1)) {
+        while (getchar() != '\n');
+        printf("Entrada invalida, ingrese 1 o 0: ");
+    }
+    while (getchar() != '\n');
+    m->disponible = (bool)disp;
+}
+
 void generar_reporte_disponibilidad(bool *estado) {
     t_autos r;
+    int disp;
     FILE *f = fopen("autos.txt", "r");
     if (f == NULL) puts("Error al abrir el archivo");
     else {
@@ -35,7 +65,8 @@ void generar_reporte_disponibilidad(bool *estado) {
             if (f3 == NULL) puts("Error al abrir el archivo");
 
             else {
-                for (int i=0; fscanf(f, "%s %s %c %d %f %d", r.marca, r.modelo, &r.categoria, &r.anio, &r.precioPorDia, &r.disponible) == 6; i++) {
+                for (int i=0; fscanf(f, "%s %s %c %d %f %d", r.marca, r.modelo, &r.categoria, &r.anio, &r.precioPorDia, &disp) == 6; i++) {
+                    r.disponible = (bool)disp;
                     if (r.disponible) {
                         fprintf(f2, "%s %s %c %d %.2f %d\n", r.marca, r.modelo, r.categoria, r.anio, r.precioPorDia, r.disponible);
                     }
@@ -64,7 +95,8 @@ bool continuar(char *rta) {
 void menu() {
     t_autos m;
     int menu;
-    char categoria, rta_categoria;
+    int disp;
+    char categoria, rta;
     bool estado;
     do {
         printf("\n1. Agregar un auto.\n"
@@ -84,6 +116,20 @@ void menu() {
                 break;
             }
             case 1: {
+                FILE *f = fopen("autos.txt", "a");
+                if (f == NULL) puts ("Error al abrir");
+                else {
+                    do {
+                        carga_datos(&m);
+                        fprintf (f, "%s %s %c %d %.2f %d\n", m.marca, m.modelo, m.categoria, m.anio, m.precioPorDia, m.disponible);
+
+                        printf("Deseas agregar otra entrada (S:Si - N:No): ");
+                        scanf("%c", &rta);
+                        while (getchar() != '\n');
+                    } while (continuar(&rta));
+                    fclose(f);
+                }
+
                 break;
             }
             case 2: {
@@ -91,7 +137,8 @@ void menu() {
                 FILE *f = fopen("autos.txt", "r");
                 if (f == NULL) puts("Error al abrir el archivo");
                 else {
-                    for (int i=0; fscanf(f, "%s %s %c %d %f %d", m.marca, m.modelo, &m.categoria, &m.anio, &m.precioPorDia, &m.disponible) == 6; i++) {
+                    for (int i=0; fscanf(f, "%s %s %c %d %f %d", m.marca, m.modelo, &m.categoria, &m.anio, &m.precioPorDia, &disp) == 6; i++) {
+                        m.disponible = (bool)disp;
                         printf("%-15s %-15s %-5c %-6d %-10.2f %-5d\n", m.marca, m.modelo, m.categoria, m.anio, m.precioPorDia, m.disponible);
                     }
                     fclose(f);
@@ -99,6 +146,16 @@ void menu() {
                 break;
             }
             case 3: {
+                FILE *f = fopen("autos.txt", "r");
+                if (f == NULL) puts("Error al abrir el archivo");
+                else {
+                    for (int i=0; fscanf(f, "%s %s %c %d %f %d", m.marca, m.modelo, &m.categoria, &m.anio, &m.precioPorDia, &disp) == 6; i++) {
+                        m.disponible = (bool)disp;
+                        if (m.anio >= 2020) printf("%-15s %-15s %-5c %-6d %-10.2f\n", m.marca, m.modelo, m.categoria, m.anio, m.precioPorDia);
+                    }
+                    fclose(f);
+                }
+
                 break;
             }
             case 4: {
@@ -110,15 +167,16 @@ void menu() {
                     FILE *f = fopen("autos.txt", "r");
                     if (f == NULL) puts("Error al abrir el archivo");
                     else {
-                        for (int i=0; fscanf(f, "%s %s %c %d %f %d", m.marca, m.modelo, &m.categoria, &m.anio, &m.precioPorDia, &m.disponible) == 6; i++) {
+                        for (int i=0; fscanf(f, "%s %s %c %d %f %d", m.marca, m.modelo, &m.categoria, &m.anio, &m.precioPorDia, &disp) == 6; i++) {
+                            m.disponible = (bool)disp;
                             if (m.categoria == categoria) printf("%-15s %-15s %-5c %-6d %-10.2f\n", m.marca, m.modelo, m.categoria, m.anio, m.precioPorDia);
                         }
                         fclose(f);
                     }
                     printf("Deseas buscar otra categoria (S:Si - N:No): ");
-                    scanf("%c", &rta_categoria);
+                    scanf("%c", &rta);
                     while (getchar() != '\n');
-                } while (continuar(&rta_categoria));
+                } while (continuar(&rta));
                 break;
             }
             case 5: {
@@ -142,7 +200,6 @@ void menu() {
 }
 
 int main() {
-
     menu();
     return 0;
 }
