@@ -87,6 +87,15 @@ void menu() {
                 break;
             }
             case 2: {
+                printf("Listado completo: \n");
+                FILE *f = fopen("autos.txt", "r");
+                if (f == NULL) puts("Error al abrir el archivo");
+                else {
+                    for (int i=0; fscanf(f, "%s %s %c %d %f %d", m.marca, m.modelo, &m.categoria, &m.anio, &m.precioPorDia, &m.disponible) == 6; i++) {
+                        printf("%-15s %-15s %-5c %-6d %-10.2f %-5d\n", m.marca, m.modelo, m.categoria, m.anio, m.precioPorDia, m.disponible);
+                    }
+                    fclose(f);
+                }
                 break;
             }
             case 3: {
