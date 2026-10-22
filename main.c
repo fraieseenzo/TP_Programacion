@@ -67,13 +67,13 @@ void menu() {
     char categoria, rta_categoria;
     bool estado;
     do {
-        printf("\n1.Aniadir un auto.\n"
-           "2.Listado completo.\n"
-           "3.Listado de autos modelo 2020 o mas nuevos.\n"
-           "4.Busqueda por categoria.\n"
-           "5.Ver autos ocupados.\n"
-           "6.Ver autos disponibles.\n"
-           "0.Salir\n"
+        printf("\n1. Agregar un auto.\n"
+           "2. Listado completo.\n"
+           "3. Listado de autos modelo 2020 o mas nuevos.\n"
+           "4. Busqueda por categoria.\n"
+           "5. Ver autos ocupados.\n"
+           "6. Ver autos disponibles.\n"
+           "0. Salir\n"
            "Ingrese una opcion: ");
         scanf("%d", &menu);
         while (getchar() != '\n');
@@ -87,6 +87,15 @@ void menu() {
                 break;
             }
             case 2: {
+                printf("Listado completo: \n");
+                FILE *f = fopen("autos.txt", "r");
+                if (f == NULL) puts("Error al abrir el archivo");
+                else {
+                    for (int i=0; fscanf(f, "%s %s %c %d %f %d", m.marca, m.modelo, &m.categoria, &m.anio, &m.precioPorDia, &m.disponible) == 6; i++) {
+                        printf("%-15s %-15s %-5c %-6d %-10.2f %-5d\n", m.marca, m.modelo, m.categoria, m.anio, m.precioPorDia, m.disponible);
+                    }
+                    fclose(f);
+                }
                 break;
             }
             case 3: {
@@ -133,7 +142,7 @@ void menu() {
 }
 
 int main() {
-    t_autos autos;
+
     menu();
     return 0;
 }
